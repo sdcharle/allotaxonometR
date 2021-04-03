@@ -1,0 +1,14 @@
+Package: allotaxonometR
+Type: Package
+Title: R impelementation of ideas from 'Allotaxonometry and rank-turbulence divergence: A universal instrument for comparing complex systems' by Peter Sheridan Dodds, and others
+Version: 0.1.0
+Author: Stephen Charlesworth
+Maintainer: Stephen Charlesworth <mistasteve@gmail.com>
+Description: Tool for evaluating changes in complex systems by examining changes in rankings of the components over time (examples, baby names, words on Twitter, NBA point total rankings.)
+License: GPL-3
+Encoding: UTF-8
+LazyData: true
+Depends: tidyverse
+RoxygenNote: 7.1.1
+Suggests: 
+    testthat
