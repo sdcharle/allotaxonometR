@@ -6,7 +6,8 @@
 
 #'--------------------------------
 #'
-#' Calculate values relating to rank turbulence between two groups
+#' Calculate values relating to rank turbulence between two groups. Note original code calls things 'types'
+#' and 'sizes' whereas we go with items amd
 #'
 #' @param df1 a frame with name and count columns
 #' @param df2 another frame with name and count columns
@@ -25,9 +26,6 @@
 #' @export
 
 rank_turbulence <- function(df1, df2, alpha = 1/3, ties.method = "average") {
-
-  # q, how is it handlin na's?
-  # convert xs to zero?
 
   results <- list()
 
@@ -102,19 +100,24 @@ rank_turbulence <- function(df1, df2, alpha = 1/3, ties.method = "average") {
 
   signs <- sign(x1 - x2) # pos means side 1 bigga
 
-  # add - no, yo DON'T want items from set one w/ count 0 in normalization.
-  # see:
+    # see:
   # https://gitlab.com/compstorylab/allotaxonometer/-/blob/master/scripts-divergences/rank_turbulence_divergence.m
   # rank, I get stephen curry 29.5 -> 8 vs 29 -> 8 sexton 621 -> 39 they have 594 -> 39
 
+
+  results$alpha = alpha
   results$normalization = normalization
   results$divergences = tibble(name = big_frame$name,
                                divergence = divergence_elements,
                                sign = signs,
                                rank.1 = big_frame$rank.x,
-                               rank.2 = big_frame$rank.y)
+                               rank.2 = big_frame$rank.y,
+                               contribution_pct = 100. * abs(divergence_elements)/sum(abs(divergence_elements)) * -1* signs)
 
   return(results)
   # total div .280 vs .300
 }
+
+# To do - implement the other measures
+
 

@@ -8,7 +8,7 @@ Description: Tool for evaluating changes in complex systems by examining changes
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
-Depends: tidyverse
+Depends: tidyverse, ggfittext, viridis, grid
 RoxygenNote: 7.1.1
 Suggests: 
     testthat
