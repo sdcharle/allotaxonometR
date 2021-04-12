@@ -77,9 +77,16 @@ plot_balances <- function(div) {
   print("NOT IMPLEMENTED JACK")
 }
 
-
 # ROTATE?
 # pushViewport(viewport(name = "rotate", angle = -135, clip = "off", width = 0.7, height = 0.7))
 # print(p, vp = "rotate")
 # p
+
+# MUCHO TODOs
+
+# contours
+# labels on histo
+# more tests!
+# put on github
+
 
