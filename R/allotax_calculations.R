@@ -10,7 +10,7 @@
 #'
 #' @param df1 a frame with type and size columns
 #' @param df2 another frame with type and size columns
-#' @param alpha alpha as defined in the paper, ranges from zero to Inf
+#' @param alpha alpha as defined in the paper, ranges from zero to Inf zero accentuates rare, Inf accentuates common
 #' @param ties.method the method of handling ties, one of the options for the rank function: "average", "first", "last, "random", "max", "min"
 #'
 #' @return a list containing:
