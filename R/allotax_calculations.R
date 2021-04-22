@@ -3,23 +3,22 @@
 # https://arxiv.org/pdf/2002.09770.pdf
 # https://gitlab.com/compstorylab/allotaxonometer
 
-
 #'--------------------------------
 #'
 #' Calculate values relating to rank turbulence between two groups. Note original code calls things 'types'
-#' and 'sizes' whereas we go with items amd
+#' and 'sizes' whereas we go with types amd size
 #'
-#' @param df1 a frame with name and count columns
-#' @param df2 another frame with name and count columns
+#' @param df1 a frame with type and size columns
+#' @param df2 another frame with type and size columns
 #' @param alpha alpha as defined in the paper, ranges from zero to Inf
 #' @param ties.method the method of handling ties, one of the options for the rank function: "average", "first", "last, "random", "max", "min"
 #'
 #' @return a list containing:
-#'             count_total: counts for the two groups, expressed as percentage of the total count across groups
-#'             items_total: breakdown of items in each group as percentage of items across both groups
-#'             exclusive_items: percent of items in a group exclusive to the group
+#'             size_total: sizes for the two groups, expressed as percentage of the total size across groups
+#'             types_total: breakdown of types in each group as percentage of types across both groups
+#'             exclusive_types: percent of types in a group exclusive to the group
 #'             normalization: value used to normalize results
-#'             divergences: data frame with columns: name, divergence, sign. Negative sign if item ranked higher in the
+#'             divergences: data frame with columns: type, divergence, sign. Negative sign if type ranked higher in the
 #'                             first group
 #' @examples
 #'
@@ -29,28 +28,28 @@ rank_turbulence <- function(df1, df2, alpha = 1/3, ties.method = "average") {
 
   results <- list()
 
-  big_frame <- df1 %>% full_join(df2, by = c('name' = 'name'))
+  big_frame <- df1 %>% full_join(df2, by = c('type' = 'type'))
 
-  pct_1 <- sum(big_frame$count.x, na.rm = TRUE)/(sum(big_frame$count.x, na.rm = TRUE) +
-                                                  sum(big_frame$count.y, na.rm = TRUE))
-  results$count_total <- c(pct_1, 1-pct_1)
+  pct_1 <- sum(big_frame$size.x, na.rm = TRUE)/(sum(big_frame$size.x, na.rm = TRUE) +
+                                                  sum(big_frame$size.y, na.rm = TRUE))
+  results$size_total <- c(pct_1, 1-pct_1)
   # for NBA should be 48.8, 51.1
-  total_items <- length(unique(union(df1$name, df2$name)))
+  total_types <- length(unique(union(df1$type, df2$type)))
 
-  results$items_total <- c(nrow(df1)/total_items, nrow(df2)/total_items)
+  results$types_total <- c(nrow(df1)/total_types, nrow(df2)/total_types)
   # should be 80.4 79.0 - getting 82.1, 80.5 # get 80.4, 79 if we filter 0 point players...
   # get 82, 80.1 if we filter 0 pts up front
 
-  exc_1 <- sum(!is.na(big_frame$count.x) & big_frame$count.x > 0 & is.na(big_frame$count.y))
-  exc_2 <- sum(is.na(big_frame$count.x) & !is.na(big_frame$count.y) & big_frame$count.y > 0)
+  exc_1 <- sum(!is.na(big_frame$size.x) & big_frame$size.x > 0 & is.na(big_frame$size.y))
+  exc_2 <- sum(is.na(big_frame$size.x) & !is.na(big_frame$size.y) & big_frame$size.y > 0)
   # NBA: 26.1, 24.8 # 23.7, 22.3??? #  if filter out non scorers
-  results$exclusive_items <- c(exc_1/nrow(df1), exc_2/nrow(df2))
+  results$exclusive_types <- c(exc_1/nrow(df1), exc_2/nrow(df2))
 
-  indices1 = !is.na(big_frame$count.x)
-  indices2 = !is.na(big_frame$count.y)
+  indices1 = !is.na(big_frame$size.x)
+  indices2 = !is.na(big_frame$size.y)
 
-  mincount1 <- min(big_frame$count.x, na.rm = T)
-  mincount2 <- min(big_frame$count.y, na.rm = T)
+  minsize1 <- min(big_frame$size.x, na.rm = T)
+  minsize2 <- min(big_frame$size.y, na.rm = T)
 
   N1 = sum(indices1)
   N2 = sum(indices2)
@@ -63,11 +62,11 @@ rank_turbulence <- function(df1, df2, alpha = 1/3, ties.method = "average") {
 
   # fix nas now we did that
   big_frame <- big_frame %>%
-    mutate(count.x = replace_na(count.x, mincount1 - 1),
-           count.y = replace_na(count.y,mincount2 - 1))
+    mutate(size.x = replace_na(size.x, minsize1 - 1),
+           size.y = replace_na(size.y,minsize2 - 1))
 
-  big_frame$rank.x <- rank(-big_frame$count.x, ties.method = "average")
-  big_frame$rank.y <- rank(-big_frame$count.y, ties.method = "average")
+  big_frame$rank.x <- rank(-big_frame$size.x, ties.method = "average")
+  big_frame$rank.y <- rank(-big_frame$size.y, ties.method = "average")
 
   x1 <- big_frame$rank.x ^ -1
   x2 <- big_frame$rank.y ^ -1
@@ -107,7 +106,7 @@ rank_turbulence <- function(df1, df2, alpha = 1/3, ties.method = "average") {
 
   results$alpha = alpha
   results$normalization = normalization
-  results$divergences = tibble(name = big_frame$name,
+  results$divergences = tibble(type = big_frame$type,
                                divergence = divergence_elements,
                                sign = signs,
                                rank.1 = big_frame$rank.x,
